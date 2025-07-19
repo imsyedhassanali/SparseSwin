@@ -70,12 +70,8 @@ if __name__ == '__main__':
     datasets = 'cifar10'  # or 'cifar100'
 
     if datasets == 'cifar100':
-        train_dataset = datasets.CIFAR100(root='./data', train=True, download=True, transform=data_transform['train'])
-        val_dataset   = datasets.CIFAR100(root='./data', train=False, download=True, transform=data_transform['val'])
         num_classes = 100
     else:
-        train_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=data_transform['train'])
-        val_dataset   = datasets.CIFAR10(root='./data', train=False, download=True, transform=data_transform['val'])
         num_classes = 10
 
     model = build.buildSparseSwin(
