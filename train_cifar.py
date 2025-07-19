@@ -26,29 +26,29 @@ data_transform = {
     }
 
 status = False
-# Todo: Train on CIFAR10
-train_dataset = datasets.CIFAR10(
-                root='./datasets/torch_cifar10/', 
-                train=True, 
-                transform=data_transform['train'], 
-                download=True)
-val_dataset = datasets.CIFAR10(
-                root='./datasets/torch_cifar10/', 
-                train=False, 
-                transform=data_transform['val'], 
-                download=True)
-
-# # Todo: Train on CIFAR100
-# train_dataset = datasets.CIFAR100(
-#                 root='./datasets/torch_cifar100/', 
+# # Todo: Train on CIFAR10
+# train_dataset = datasets.CIFAR10(
+#                 root='./datasets/torch_cifar10/', 
 #                 train=True, 
 #                 transform=data_transform['train'], 
 #                 download=True)
-# val_dataset = datasets.CIFAR100(
-#                 root='./datasets/torch_cifar100/', 
+# val_dataset = datasets.CIFAR10(
+#                 root='./datasets/torch_cifar10/', 
 #                 train=False, 
 #                 transform=data_transform['val'], 
 #                 download=True)
+
+# Todo: Train on CIFAR100
+train_dataset = datasets.CIFAR100(
+                root='./datasets/torch_cifar100/', 
+                train=True, 
+                transform=data_transform['train'], 
+                download=True)
+val_dataset = datasets.CIFAR100(
+                root='./datasets/torch_cifar100/', 
+                train=False, 
+                transform=data_transform['val'], 
+                download=True)
 
 batch_size = 12
 train_loader = torch.utils.data.DataLoader(
@@ -67,10 +67,10 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-        dataset_name = "cifar10"  # or "cifar100"
+        dataset_name = "cifar100"  # or "cifar10"
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        num_classes = 10
+        num_classes = 100
         swin_type = 'tiny'
         reg_type, reg_lambda = 'l1', 1e-5
         device = torch.device('cuda')
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         train(
                 train_loader, 
                 swin_type, 
-                datasets, 
+                dataset_name, 
                 epochs, 
                 model, 
                 lf, 
