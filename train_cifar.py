@@ -67,7 +67,7 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-        dataset_name = "cifar100"  # or "cifar10"
+        dataset = "my_cifar100"  # or "cifar10"
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         num_classes = 100
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         train(
                 train_loader, 
                 swin_type, 
-                dataset_name, 
+                dataset, 
                 epochs, 
                 model, 
                 lf, 
