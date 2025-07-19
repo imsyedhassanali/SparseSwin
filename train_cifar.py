@@ -76,7 +76,14 @@ if __name__ == '__main__':
     else:
         num_classes = 10
 
-    swin_type = 'tiny'
+# ✅ Swin type
+    swin_type = args.model_type  # or just 'tiny'
+
+# ✅ Epochs
+    epochs = args.epochs  # or set manually: epochs = 30
+
+    ltoken_num = 49              # default as in repo/paper
+    lf = 2   
 
     model = build.buildSparseSwin(
         image_resolution=224,
