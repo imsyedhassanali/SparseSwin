@@ -74,24 +74,24 @@ if dataset == 'cifar10':
                     root='./datasets/torch_cifar10/', 
                     train=True, 
                     transform=data_transform['train'], 
-                    download=status)
+                    download=True)
     val_dataset = datasets.CIFAR10(
                     root='./datasets/torch_cifar10/', 
                     train=False, 
                     transform=data_transform['val'], 
-                    download=status)
+                    download=True)
 elif dataset == 'cifar100':
     # Todo: Train on CIFAR100
     train_dataset = datasets.CIFAR100(
                     root='./datasets/torch_cifar100/', 
                     train=True, 
                     transform=data_transform['train'], 
-                    download=status)
+                    download=True)
     val_dataset = datasets.CIFAR100(
                     root='./datasets/torch_cifar100/', 
                     train=False, 
                     transform=data_transform['val'], 
-                    download=status)
+                    download=True)
 else:
     print('Dataset is not availabel')
 
