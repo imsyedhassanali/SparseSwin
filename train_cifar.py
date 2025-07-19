@@ -81,9 +81,12 @@ if __name__ == '__main__':
 
 # ✅ Epochs
     epochs = 30
-
-    ltoken_num = 49              # default as in repo/paper
     lf = 2   
+    batch_size = 128
+    ltoken_num = 49
+    reg_type = "l1"
+    reg_lambda = 1e-5
+    show_per = 300  
 
     model = build.buildSparseSwin(
         image_resolution=224,
