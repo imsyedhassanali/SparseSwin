@@ -67,26 +67,29 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("✅ Using device:", device)
-    datasets = 'cifar10'  # or 'cifar100'
 
     if datasets == 'cifar100':
         num_classes = 100
+        swin_type = 'tiny'
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        epochs = 30
+        lf = 2   
+        batch_size = 128
+        ltoken_num = 49
+        reg_type = "l1"
+        reg_lambda = 1e-5
+        show_per = 200  
     else:
         num_classes = 10
-
-# ✅ Swin type
-    swin_type = 'tiny'
-
-# ✅ Epochs
-    epochs = 30
-    lf = 2   
-    batch_size = 128
-    ltoken_num = 49
-    reg_type = "l1"
-    reg_lambda = 1e-5
-    show_per = 300  
+        swin_type = 'tiny'
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        epochs = 30
+        lf = 2   
+        batch_size = 128
+        ltoken_num = 49
+        reg_type = "l1"
+        reg_lambda = 1e-5
+        show_per = 200  
 
     model = build.buildSparseSwin(
         image_resolution=224,
