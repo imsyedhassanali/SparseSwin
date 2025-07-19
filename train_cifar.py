@@ -106,7 +106,7 @@ if __name__ == '__main__':
     train(
         train_loader, 
         swin_type, 
-        dataset, 
+        datasets, 
         epochs, 
         model, 
         lf, 
