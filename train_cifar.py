@@ -67,33 +67,37 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-
         dataset_name = "cifar10"  # or "cifar100"
-        train_dataset = datasets.CIFAR100(
-        root='./datasets/torch_cifar100/',
+        
+        train_dataset = datasets.CIFAR10(
+        root='./datasets/torch_cifar10/',
         train=True,
         transform=data_transform['train'],
-        download=True
-        val_dataset = datasets.CIFAR100(
-        root='./datasets/torch_cifar100/',
+        download=True,
+
+        val_dataset = datasets.CIFAR10(
+        root='./datasets/torch_cifar10/',
         train=False,
         transform=data_transform['val'],
         download=True
-        num_classes = 100
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        num_classes = 10
+        swin_type = 'tiny'
+        reg_type, reg_lambda = 'l1', 1e-5
+        device = torch.device('cuda')
+        epochs = 1
+        show_per = 200
+        ltoken_num, ltoken_dims = 49, 256
+        lf = 2
+        batch_size = 64
+        reg_lambda = 1e-5
+        
         
         
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=12, shuffle=True, num_workers=4, pin_memory=True)
         val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=12, shuffle=True, num_workers=4, pin_memory=True)
 
-        swin_type = 'tiny'
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        epochs = 1
-        lf = 2   
-        batch_size = 64
-        ltoken_num = 49
-        reg_type = "l1"
-        reg_lambda = 1e-5
-        show_per = 200  
 
         model = build.buildSparseSwin(
                 image_resolution=224,
