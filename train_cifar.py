@@ -67,6 +67,8 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("✅ Using device:", device)
     datasets = 'cifar10'  # or 'cifar100'
 
     if datasets == 'cifar100':
