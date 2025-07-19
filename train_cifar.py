@@ -38,17 +38,17 @@ val_dataset = datasets.CIFAR10(
                 transform=data_transform['val'], 
                 download=True)
 
-# Todo: Train on CIFAR100
-train_dataset = datasets.CIFAR100(
-                root='./datasets/torch_cifar100/', 
-                train=True, 
-                transform=data_transform['train'], 
-                download=True)
-val_dataset = datasets.CIFAR100(
-                root='./datasets/torch_cifar100/', 
-                train=False, 
-                transform=data_transform['val'], 
-                download=True)
+# # Todo: Train on CIFAR100
+# train_dataset = datasets.CIFAR100(
+#                 root='./datasets/torch_cifar100/', 
+#                 train=True, 
+#                 transform=data_transform['train'], 
+#                 download=True)
+# val_dataset = datasets.CIFAR100(
+#                 root='./datasets/torch_cifar100/', 
+#                 train=False, 
+#                 transform=data_transform['val'], 
+#                 download=True)
 
 batch_size = 12
 train_loader = torch.utils.data.DataLoader(
@@ -69,35 +69,18 @@ val_loader = torch.utils.data.DataLoader(
 if __name__ == '__main__':
 
         dataset_name = "cifar10"  # or "cifar100"
+        train_dataset = datasets.CIFAR100(
+        root='./datasets/torch_cifar100/',
+        train=True,
+        transform=data_transform['train'],
+        download=True
+        val_dataset = datasets.CIFAR100(
+        root='./datasets/torch_cifar100/',
+        train=False,
+        transform=data_transform['val'],
+        download=True
+        num_classes = 100
         
-        if dataset_name == "cifar100":
-            train_dataset = datasets.CIFAR100(
-                root='./datasets/torch_cifar100/',
-                train=True,
-                transform=data_transform['train'],
-                download=True
-            )
-            val_dataset = datasets.CIFAR100(
-                root='./datasets/torch_cifar100/',
-                train=False,
-                transform=data_transform['val'],
-                download=True
-            )
-            num_classes = 100
-        else:
-            train_dataset = datasets.CIFAR10(
-                root='./datasets/torch_cifar10/',
-                train=True,
-                transform=data_transform['train'],
-                download=True
-            )
-            val_dataset = datasets.CIFAR10(
-                root='./datasets/torch_cifar10/',
-                train=False,
-                transform=data_transform['val'],
-                download=True
-            )
-            num_classes = 10
         
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=12, shuffle=True, num_workers=4, pin_memory=True)
         val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=12, shuffle=True, num_workers=4, pin_memory=True)
@@ -106,7 +89,7 @@ if __name__ == '__main__':
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         epochs = 1
         lf = 2   
-        batch_size = 128
+        batch_size = 64
         ltoken_num = 49
         reg_type = "l1"
         reg_lambda = 1e-5
