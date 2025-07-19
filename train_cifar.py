@@ -76,6 +76,8 @@ if __name__ == '__main__':
     else:
         num_classes = 10
 
+    swin_type = 'tiny'
+
     model = build.buildSparseSwin(
         image_resolution=224,
         swin_type='tiny',
