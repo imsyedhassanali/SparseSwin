@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 freeze_12=False,
                 device=device)
         
-        ptimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.01)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.01)
         criterion = torch.nn.CrossEntropyLoss()
         
         train(
