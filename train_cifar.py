@@ -67,7 +67,7 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-    if dataset.lower() == "cifar100":
+    if datasets.lower() == "cifar100":
         num_classes = 100
         swin_type = 'tiny'
         reg_type, reg_lambda = 'l1', 1e-5
