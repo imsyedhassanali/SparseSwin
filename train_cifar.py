@@ -39,16 +39,16 @@ val_dataset = datasets.CIFAR10(
                 download=True)
 
 # Todo: Train on CIFAR100
-# train_dataset = datasets.CIFAR100(
-#                 root='./datasets/torch_cifar100/', 
-#                 train=True, 
-#                 transform=data_transform['train'], 
-#                 download=status)
-# val_dataset = datasets.CIFAR100(
-#                 root='./datasets/torch_cifar100/', 
-#                 train=False, 
-#                 transform=data_transform['val'], 
-#                 download=status)
+train_dataset = datasets.CIFAR100(
+                root='./datasets/torch_cifar100/', 
+                train=True, 
+                transform=data_transform['train'], 
+                download=True)
+val_dataset = datasets.CIFAR100(
+                root='./datasets/torch_cifar100/', 
+                train=False, 
+                transform=data_transform['val'], 
+                download=True)
 
 batch_size = 12
 train_loader = torch.utils.data.DataLoader(
