@@ -68,18 +68,6 @@ val_loader = torch.utils.data.DataLoader(
 
 if __name__ == '__main__':
         dataset_name = "cifar10"  # or "cifar100"
-        
-        train_dataset = datasets.CIFAR10(
-        root='./datasets/torch_cifar10/',
-        train=True,
-        transform=data_transform['train'],
-        download=True,
-
-        val_dataset = datasets.CIFAR10(
-        root='./datasets/torch_cifar10/',
-        train=False,
-        transform=data_transform['val'],
-        download=True
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         num_classes = 10
