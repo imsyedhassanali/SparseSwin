@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
         swin_type = 'tiny'
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        epochs = 30
+        epochs = 1
         lf = 2   
         batch_size = 128
         ltoken_num = 49
