@@ -67,31 +67,30 @@ val_loader = torch.utils.data.DataLoader(
 
 
 if __name__ == '__main__':
-        datasets = 'cifar10'  # or 'cifar100'
-        
-        if datasets == 'cifar100':
-            train_dataset = datasets.CIFAR100(root='./data', train=True, download=True, transform=data_transform['train'])
-            val_dataset   = datasets.CIFAR100(root='./data', train=False, download=True, transform=data_transform['val'])
-            num_classes = 100
-        else:
-            train_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=data_transform['train'])
-            val_dataset   = datasets.CIFAR10(root='./data', train=False, download=True, transform=data_transform['val'])
-            num_classes = 10
-        
-        model = build.buildSparseSwin(
-            image_resolution=224,
-            swin_type='tiny',
-            num_classes=num_classes,
-            ltoken_num=49,
-            ltoken_dims=256,
-            num_heads=16,
-            qkv_bias=True,
-            lf=2,
-            attn_drop_prob=.0,
-            lin_drop_prob=.0,
-            freeze_12=False,
-            device=device
-        )
+    datasets = 'cifar10'  # or 'cifar100'
+
+    if datasets == 'cifar100':
+        train_dataset = datasets.CIFAR100(root='./data', train=True, download=True, transform=data_transform['train'])
+        val_dataset   = datasets.CIFAR100(root='./data', train=False, download=True, transform=data_transform['val'])
+        num_classes = 100
+    else:
+        train_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=data_transform['train'])
+        val_dataset   = datasets.CIFAR10(root='./data', train=False, download=True, transform=data_transform['val'])
+        num_classes = 10
+
+    model = build.buildSparseSwin(
+        image_resolution=224,
+        swin_type='tiny',
+        num_classes=num_classes,
+        ltoken_num=49,
+        ltoken_dims=256,
+        num_heads=16,
+        qkv_bias=True,
+        lf=2,
+        attn_drop_prob=.0,
+        lin_drop_prob=.0,
+        freeze_12=False,
+        device=device)
 
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.01)
