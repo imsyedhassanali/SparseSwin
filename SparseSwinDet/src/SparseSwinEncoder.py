@@ -55,44 +55,35 @@ class MultiheadAttention(nn.Module):
         return out, attention_weights
 
 class SparseToken(nn.Module):
-    """Some Information about LatentTokenSet"""
     def __init__(self, in_channels, hw_size, ltoken_num, ltoken_dim, device):
         super(SparseToken, self).__init__()
         self.ltoken_num = ltoken_num
         self.device = device
         kernel_size, stride = 3, 1
         self.convert = nn.Conv2d(
-            in_channels=in_channels, 
-            out_channels=ltoken_dim, 
-            kernel_size=kernel_size, 
-            stride=stride, 
+            in_channels=in_channels,
+            out_channels=ltoken_dim,
+            kernel_size=kernel_size,
+            stride=stride,
             padding='same'
-        ) 
-        
+        )
+
         self.pe = self.positional_encoding(max_len=hw_size * hw_size, embed_dim=ltoken_dim, device=device)
-        self.lin_t = nn.Linear(in_features=hw_size * hw_size, out_features=ltoken_num)
-    
+-       self.lin_t = nn.Linear(in_features=hw_size * hw_size, out_features=ltoken_num)
++       self.lin_t = None  # will be created dynamically later
+
     def forward(self, x):
-        """
-        input:
-            x            : B, H, W, C
-        output:
-            latent_token : B, ltoken_num, ltoken_dim
-        """
-        x = x.permute(0, 3, 1, 2) # B, C, H, W
-        
-        sparse_token = self.convert(x)                        # B, ltoken_dim, H, WW
-        sparse_token = sparse_token.flatten(start_dim=2)      # B, ltoken_dim, H*W
-        
-        # add positional encoding  
-        sparse_token = sparse_token.transpose(1, 2)  # B, H*W, ltoken_dim
-        
-        # 🔧 Interpolate positional encoding if sizes don't match
+        x = x.permute(0, 3, 1, 2)  # B, C, H, W
+        sparse_token = self.convert(x)       # B, ltoken_dim, H, W
+        sparse_token = sparse_token.flatten(start_dim=2)  # B, ltoken_dim, H*W
+        sparse_token = sparse_token.transpose(1, 2)       # B, H*W, ltoken_dim
+
+        # positional encoding interpolation stays same
         if sparse_token.shape[1] != self.pe.shape[1]:
-            pe = self.pe.permute(0, 2, 1)  # (1, dim, length)
+            pe = self.pe.permute(0, 2, 1)
             pe = torch.nn.functional.interpolate(
                 pe,
-                size=sparse_token.shape[1],  # match H*W
+                size=sparse_token.shape[1],
                 mode='linear',
                 align_corners=False
             )
@@ -100,14 +91,23 @@ class SparseToken(nn.Module):
             sparse_token = sparse_token + pe
         else:
             sparse_token = sparse_token + self.pe
-        
-        # sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
 
-        
-        sparse_token = self.lin_t(sparse_token)               # B, ltoken_dim, ltoken_num
-        # sparse_token = sparse_token.transpose(1, 2)           # B, ltoken_num, ltoken_dim
-        
+-       # sparse_token = sparse_token.transpose(1, 2)
+-       sparse_token = self.lin_t(sparse_token)
+-       # sparse_token = sparse_token.transpose(1, 2)
+
++       # 🔧 Build lin_t dynamically based on current feature size
++       in_features = sparse_token.shape[1]  # current H*W
++       if self.lin_t is None or self.lin_t.in_features != in_features:
++           self.lin_t = nn.Linear(in_features=in_features, out_features=self.ltoken_num).to(self.device)
++
++       # (B, H*W, ltoken_dim) → (B, ltoken_dim, H*W) to match Linear's expectations
++       sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
++       sparse_token = self.lin_t(sparse_token)      # B, ltoken_dim, ltoken_num
++       sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_num, ltoken_dim
+
         return sparse_token
+
     
     def positional_encoding(self, max_len, embed_dim, device):
         # initialize a matrix angle_rads of all the angles
