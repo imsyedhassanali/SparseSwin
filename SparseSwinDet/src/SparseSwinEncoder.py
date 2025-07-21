@@ -101,11 +101,11 @@ class SparseToken(nn.Module):
         else:
             sparse_token = sparse_token + self.pe
         
-        sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
+        # sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
 
         
         sparse_token = self.lin_t(sparse_token)               # B, ltoken_dim, ltoken_num
-        sparse_token = sparse_token.transpose(1, 2)           # B, ltoken_num, ltoken_dim
+        # sparse_token = sparse_token.transpose(1, 2)           # B, ltoken_num, ltoken_dim
         
         return sparse_token
     
