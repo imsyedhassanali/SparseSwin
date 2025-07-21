@@ -68,58 +68,62 @@ class SparseToken(nn.Module):
             padding='same'
         )
 
-        self.pe = self.positional_encoding(max_len=hw_size * hw_size, embed_dim=ltoken_dim, device=device)
--       self.lin_t = nn.Linear(in_features=hw_size * hw_size, out_features=ltoken_num)
-+       self.lin_t = None  # will be created dynamically later
+        # store positional encoding for initial size
+        self.pe = self.positional_encoding(
+            max_len=hw_size * hw_size,
+            embed_dim=ltoken_dim,
+            device=device
+        )
+
+        # linear projection will be created dynamically based on actual H*W
+        self.lin_t = None
 
     def forward(self, x):
-        x = x.permute(0, 3, 1, 2)  # B, C, H, W
-        sparse_token = self.convert(x)       # B, ltoken_dim, H, W
-        sparse_token = sparse_token.flatten(start_dim=2)  # B, ltoken_dim, H*W
-        sparse_token = sparse_token.transpose(1, 2)       # B, H*W, ltoken_dim
+        # x: (B, H, W, C)
+        x = x.permute(0, 3, 1, 2)  # -> (B, C, H, W)
+        sparse_token = self.convert(x)           # -> (B, ltoken_dim, H, W)
+        sparse_token = sparse_token.flatten(start_dim=2)  # -> (B, ltoken_dim, H*W)
+        sparse_token = sparse_token.transpose(1, 2)       # -> (B, H*W, ltoken_dim)
 
-        # positional encoding interpolation stays same
+        # 🔧 Interpolate positional encoding if sizes don't match
         if sparse_token.shape[1] != self.pe.shape[1]:
-            pe = self.pe.permute(0, 2, 1)
+            pe = self.pe.permute(0, 2, 1)  # (1, dim, length)
             pe = torch.nn.functional.interpolate(
                 pe,
-                size=sparse_token.shape[1],
+                size=sparse_token.shape[1],  # match H*W
                 mode='linear',
                 align_corners=False
             )
-            pe = pe.permute(0, 2, 1)
+            pe = pe.permute(0, 2, 1)  # back to (1, length, dim)
             sparse_token = sparse_token + pe
         else:
             sparse_token = sparse_token + self.pe
 
--       # sparse_token = sparse_token.transpose(1, 2)
--       sparse_token = self.lin_t(sparse_token)
--       # sparse_token = sparse_token.transpose(1, 2)
+        # 🔧 Dynamically create lin_t based on current H*W
+        in_features = sparse_token.shape[1]
+        if self.lin_t is None or self.lin_t.in_features != in_features:
+            self.lin_t = nn.Linear(
+                in_features=in_features,
+                out_features=self.ltoken_num
+            ).to(self.device)
 
-+       # 🔧 Build lin_t dynamically based on current feature size
-+       in_features = sparse_token.shape[1]  # current H*W
-+       if self.lin_t is None or self.lin_t.in_features != in_features:
-+           self.lin_t = nn.Linear(in_features=in_features, out_features=self.ltoken_num).to(self.device)
-+
-+       # (B, H*W, ltoken_dim) → (B, ltoken_dim, H*W) to match Linear's expectations
-+       sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
-+       sparse_token = self.lin_t(sparse_token)      # B, ltoken_dim, ltoken_num
-+       sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_num, ltoken_dim
+        # Apply linear projection: (B, H*W, ltoken_dim) -> (B, ltoken_dim, H*W)
+        sparse_token = sparse_token.transpose(1, 2)  # (B, ltoken_dim, H*W)
+        sparse_token = self.lin_t(sparse_token)      # (B, ltoken_dim, ltoken_num)
+        sparse_token = sparse_token.transpose(1, 2)  # (B, ltoken_num, ltoken_dim)
 
         return sparse_token
 
-    
     def positional_encoding(self, max_len, embed_dim, device):
-        # initialize a matrix angle_rads of all the angles
         angle_rads = np.arange(max_len)[:, np.newaxis] / np.power(
-            10_000, (2 * (np.arange(embed_dim)[np.newaxis, :] // 2)) / np.float32(embed_dim)
+            10_000,
+            (2 * (np.arange(embed_dim)[np.newaxis, :] // 2)) / np.float32(embed_dim)
         )
         angle_rads[:, 0::2] = np.sin(angle_rads[:, 0::2])
         angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
-
         pos_encoding = angle_rads[np.newaxis, ...]
-
         return torch.tensor(pos_encoding, dtype=torch.float32, device=device, requires_grad=False)
+
 
 class MLP(nn.Module):
     """Some Information about MLP"""
