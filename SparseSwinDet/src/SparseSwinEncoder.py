@@ -85,9 +85,24 @@ class SparseToken(nn.Module):
         sparse_token = sparse_token.flatten(start_dim=2)      # B, ltoken_dim, H*W
         
         # add positional encoding  
-        sparse_token = sparse_token.transpose(1, 2)             # B, H*W, ltoken_dim
-        sparse_token = sparse_token + self.pe                 # B, H*W, ltoken_dim
-        sparse_token = sparse_token.transpose(1, 2)             # B, ltoken_dim,  H*W
+        sparse_token = sparse_token.transpose(1, 2)  # B, H*W, ltoken_dim
+        
+        # 🔧 Interpolate positional encoding if sizes don't match
+        if sparse_token.shape[1] != self.pe.shape[1]:
+            pe = self.pe.permute(0, 2, 1)  # (1, dim, length)
+            pe = torch.nn.functional.interpolate(
+                pe,
+                size=sparse_token.shape[1],  # match H*W
+                mode='linear',
+                align_corners=False
+            )
+            pe = pe.permute(0, 2, 1)
+            sparse_token = sparse_token + pe
+        else:
+            sparse_token = sparse_token + self.pe
+        
+        sparse_token = sparse_token.transpose(1, 2)  # B, ltoken_dim, H*W
+
         
         sparse_token = self.lin_t(sparse_token)               # B, ltoken_dim, ltoken_num
         sparse_token = sparse_token.transpose(1, 2)           # B, ltoken_num, ltoken_dim
